@@ -4,6 +4,8 @@ use std::{
     time::{Duration, Instant},
 };
 
+// use common::TestPosition;
+
 const TIMEOUT: f32 = 5.0;
 
 struct Connection {
@@ -63,15 +65,16 @@ fn main() {
     let socket = UdpSocket::bind(format!("{address}:{port}")).expect("Couldn't bind to address");
     socket.set_nonblocking(true).unwrap();
 
-    println!("Server started");
+    println!("Server started\n");
 
     let mut buf = [0u8; 1024];
 
     let timestep = Duration::from_secs_f64(1.0 / 20.0);
 
-    println!("====");
-    println!("Timestep: {}", timestep.as_secs_f64());
-    println!("====\n");
+    println!("===== Config =====");
+    println!("Timestep: {}\n", timestep.as_secs_f64());
+
+    // let mut test_position = TestPosition::default();
 
     loop {
         let start = Instant::now();
@@ -87,15 +90,12 @@ fn main() {
 
         let duration = start.elapsed();
 
-        // println!("Server tick: {:.8}", duration.as_secs_f64());
-
         thread::sleep(timestep - duration);
     }
 }
 
 fn handle_packet(data: &[u8]) {
-    let text = String::from_utf8_lossy(data);
+    let packet = common::decode(data).unwrap();
 
-    println!("Hello, Client!");
-    println!("Received message: {text}");
+    println!("Received packet: {:?}", packet);
 }
